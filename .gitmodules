@@ -1,0 +1,19 @@
+[submodule "Rewind/Build/subhook"]
+	path = Rewind/Build/subhook
+	url = https://github.com/drunderscore/subhook
+[submodule "Rewind/Build/metamod-source"]
+	path = Rewind/Build/metamod-source
+	url = https://github.com/alliedmodders/metamod-source
+[submodule "Rewind/subhook"]
+	path = Rewind/subhook
+	url = https://github.com/drunderscore/subhook
+[submodule "Rewind/metamod-source"]
+	path = Rewind/metamod-source
+	url = https://github.com/alliedmodders/metamod-source
+[submodule "Rewind/JMP"]
+	path = Rewind/JMP
+	url = https://github.com/drunderscore/JMP/
+[submodule "Rewind/hl2sdk"]
+	path = Rewind/hl2sdk
+	url = https://github.com/drunderscore/hl2sdk
+	branch = tf2
