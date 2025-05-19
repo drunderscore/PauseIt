@@ -174,7 +174,6 @@ Action CommandPauseTechnical(int client, int args)
         int max_clients = GetMaxClients();
         for (int i = 1; i <= max_clients; i++)
         {
-            // TODO: Is STV considered a fake client? shouldn't be.
             if (!IsClientConnected(i) || IsFakeClient(i))
                 continue;
 
