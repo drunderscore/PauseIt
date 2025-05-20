@@ -1,0 +1,5 @@
+.idea
+Build
+cmake-build-debug
+.cache
+/*.smx

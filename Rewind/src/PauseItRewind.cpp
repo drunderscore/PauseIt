@@ -12,6 +12,7 @@ namespace PauseIt::Rewind
 // FIXME: JMP IS BROKEN MEM SEARCH SIG SCAN THING
 // FIXME: JMP IS BROKEN MEM SEARCH SIG SCAN THING
 // FIXME: JMP IS BROKEN MEM SEARCH SIG SCAN THING
+// usually works tho! just a little stupid lmao
 
 // Linux x86 ONLY
 JMP::Signature Plugin::s_physics_run_think_functions("BE 01 00 00 00 90 83 EC 0C 56 E8"sv);
