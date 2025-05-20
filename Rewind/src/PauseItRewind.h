@@ -16,7 +16,7 @@ public:
     bool Unload(char* error, size_t maxlen) override;
 
     const char* GetAuthor() override { return "James Puleo (Dr. Underscore)"; }
-    const char* GetName() override { return "PauseIt: Rewind"; }
+    const char* GetName() override { return "Pause It: Rewind"; }
     const char* GetDescription() override { return "Fix bugs during server processing and simulation whilst paused."; }
     // TODO: I made this! where are we putting it tho. i want to own it i think. i do.
     const char* GetURL() override { return "https://firesidecasts.tv"; }

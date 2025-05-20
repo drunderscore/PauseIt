@@ -1,5 +1,5 @@
-# PauseIt
-The gameplay-integrity focused pause suite that'll time you out.
+# Pause It
+The gameplay-integrity focused pause suite that'll time you out
 
 ## Plugin
 Fine-grained control on pause variables for a match.
@@ -14,7 +14,7 @@ Fine-grained control on pause variables for a match.
 
 _During_ the match, you may use, for example, `pause_remaining_technical_red` to adjust the number of pauses that team has in the current moment.
 
-## PauseIt: Rewind
+## Rewind
 Low-level fixes for pauses and other gameplay-integrity goodies.
 
 ### What it Does
