@@ -18,8 +18,7 @@ public:
     const char* GetAuthor() override { return "resin"; }
     const char* GetName() override { return "Pause It: Rewind"; }
     const char* GetDescription() override { return "Fix bugs during server processing and simulation whilst paused."; }
-    // TODO: I made this! where are we putting it tho. i want to own it i think. i do.
-    const char* GetURL() override { return "https://firesidecasts.tv"; }
+    const char* GetURL() override { return "https://jame.xyz"; }
     const char* GetLicense() override { return "Hopefully BSD 2-Clause"; }
     const char* GetVersion() override { return "1.0.0"; }
     // FIXME: Doesn't this make the build non-reproducible?

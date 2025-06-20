@@ -10,7 +10,7 @@ public Plugin myinfo =
 	author = "resin",
 	description = "Pause for tournament play",
 	version = "1.0.0",
-	url = "https://github.com/FiresideCasts"
+	url = "https://jame.xyz"
 };
 
 ConVar pause_tactical_max;
