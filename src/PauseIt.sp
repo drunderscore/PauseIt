@@ -7,7 +7,7 @@
 public Plugin myinfo =
 {
 	name = "Pause It",
-	author = "Dr. Underscore",
+	author = "resin",
 	description = "Pause for tournament play",
 	version = "1.0.0",
 	url = "https://github.com/FiresideCasts"

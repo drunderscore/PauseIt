@@ -15,7 +15,7 @@ public:
     bool Load(PluginId, ISmmAPI*, char* error, size_t maxlen, bool late) override;
     bool Unload(char* error, size_t maxlen) override;
 
-    const char* GetAuthor() override { return "James Puleo (Dr. Underscore)"; }
+    const char* GetAuthor() override { return "resin"; }
     const char* GetName() override { return "Pause It: Rewind"; }
     const char* GetDescription() override { return "Fix bugs during server processing and simulation whilst paused."; }
     // TODO: I made this! where are we putting it tho. i want to own it i think. i do.
