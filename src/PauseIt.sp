@@ -179,11 +179,7 @@ Action PlayerTryUnpause(int client)
     Format(third_person_message, sizeof(third_person_message), "%s team is unpausing the game.", team_name);
     PrintToChatAllPerspective(first_person_message, third_person_message, team);
 
-    float length = 10.0;
-    CreateTimer(length, PauseTimerCallback, client);
-    CreateTimer(length - 10, PauseTimerInformTickCallback, RoundToFloor(length));
-    for (int i = 1; i <= 3; i++)
-        CreateTimer(length - i, PauseTimerInformTickCallback, i);
+    UnpauseLater(10.0, client);
 
     return Plugin_Handled;
 }
@@ -244,6 +240,14 @@ void PauseTimerCallback(Handle timer, int client)
 void PauseTimerInformTickCallback(Handle timer, int secondsRemaining)
 {
     PrintToChatAll("The game will resume in %d second%s", secondsRemaining, secondsRemaining != 1 ? "s" : "");
+}
+
+void UnpauseLater(float length, int client)
+{
+    CreateTimer(length, PauseTimerCallback, client, TIMER_FLAG_NO_MAPCHANGE);
+    CreateTimer(length - 10, PauseTimerInformTickCallback, 10, TIMER_FLAG_NO_MAPCHANGE);
+    for (int i = 1; i <= 3; i++)
+        CreateTimer(length - i, PauseTimerInformTickCallback, i, TIMER_FLAG_NO_MAPCHANGE);
 }
 
 void PrintToChatAllPerspective(const char[] first_person, const char[] third_person, int recipientTeam)
@@ -308,11 +312,7 @@ Action CommandPause(int client, const char[] name, ConVar remaining, float lengt
     if (length > 0)
     {
         PrintToChatAll("This pause will last %d seconds.", RoundToFloor(length));
-
-        CreateTimer(length, PauseTimerCallback, client);
-        CreateTimer(length - 10, PauseTimerInformTickCallback, 10);
-        for (int i = 1; i <= 3; i++)
-            CreateTimer(length - i, PauseTimerInformTickCallback, i);
+        UnpauseLater(length, client);
     }
     else
     {
