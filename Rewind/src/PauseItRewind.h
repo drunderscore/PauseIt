@@ -19,7 +19,7 @@ public:
     const char* GetName() override { return "Pause It: Rewind"; }
     const char* GetDescription() override { return "Fix bugs during server processing and simulation whilst paused."; }
     const char* GetURL() override { return "https://jame.xyz"; }
-    const char* GetLicense() override { return "Hopefully BSD 2-Clause"; }
+    const char* GetLicense() override { return "BSD-2-Clause"; }
     const char* GetVersion() override { return "1.0.0"; }
     // FIXME: Doesn't this make the build non-reproducible?
     const char* GetDate() override { return __DATE__; }
