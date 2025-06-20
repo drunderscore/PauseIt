@@ -53,6 +53,7 @@ public void OnPluginStart()
     RegConsoleCmd("pause_technical", CommandPauseTechnical);
     RegConsoleCmd("technical", CommandPauseTechnical);
     RegConsoleCmd("tech", CommandPauseTechnical);
+    RegConsoleCmd("tec", CommandPauseTechnical);
 
     HookEventEx("teamplay_restart_round", OnTeamplayRestartRound, EventHookMode_Post);
 
