@@ -35,6 +35,9 @@ bool allow_unpause;
 
 bool allow_player_unpause;
 
+Handle pause_inform_duration_timer;
+int pause_duration = 0;
+
 public void OnPluginStart()
 {
     pause_tactical_max = CreateConVar("pause_tactical_max", "-1", "Maximum number of tactical pauses a team gets each match. 0 means none, -1 means unlimited.", FCVAR_NONE);
@@ -158,6 +161,12 @@ void Unpause(int client)
     is_paused = false;
     UnpauseWithoutSideEffects(client);
     allow_player_unpause = false;
+
+    if(pause_inform_duration_timer != null)
+        KillTimer(pause_inform_duration_timer);
+
+    pause_inform_duration_timer = null;
+    pause_duration = 0;
 }
 
 Action PlayerTryUnpause(int client)
@@ -242,6 +251,14 @@ void PauseTimerInformTickCallback(Handle timer, int secondsRemaining)
     PrintToChatAll("The game will resume in %d second%s", secondsRemaining, secondsRemaining != 1 ? "s" : "");
 }
 
+Action PauseTimerInformDurationCallback(Handle timer, any data)
+{
+    pause_duration++;
+
+    PrintToChatAll("The game has been paused for %d minute%s", pause_duration, pause_duration != 1 ? "s" : "");
+    return Plugin_Continue;
+}
+
 void UnpauseLater(float length, int client)
 {
     CreateTimer(length, PauseTimerCallback, client, TIMER_FLAG_NO_MAPCHANGE);
@@ -316,6 +333,7 @@ Action CommandPause(int client, const char[] name, ConVar remaining, float lengt
     }
     else
     {
+        pause_inform_duration_timer = CreateTimer(60.0, PauseTimerInformDurationCallback, 0, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
         allow_player_unpause = true;
     }
 
