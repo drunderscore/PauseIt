@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: BSD-2-Clause
 
+#pragma semicolon 1
 #pragma newdecls required
 
 #include <sdktools>
 #include <f2stocks>
 #include <tf2>
+#include <rewind>
 
 public Plugin myinfo =
 {
@@ -25,13 +27,6 @@ ArrayList pause_remaining_tactical;
 ArrayList pause_remaining_technical;
 
 ConVar sv_pausable;
-
-// FIXME: This really has the dual-meaning of "is the server paused" AND "did we do the pause".
-//        In 100% of cases you'd actually want one or the other.
-bool is_paused;
-
-bool allow_pause;
-bool allow_unpause;
 
 bool allow_player_unpause;
 
@@ -136,43 +131,36 @@ void InitializeRemainingPauseCounts()
     }
 }
 
-void PauseWithoutSideEffects(int client)
+Action OnPauseCommand(int client, const char[] command, int argc)
 {
-    allow_pause = true;
-    FakeClientCommand(client, "setpause");
-    allow_pause = false;
+    if (IsPaused())
+    {
+        PrintToConsole(client, "You must use unpause in order to unpause.");
+        // FIXME: Chat command to unpause?
+    }
+    else
+    {
+        PrintToConsole(client, "You must use pause_technical or pause_tactical in order to pause.");
+        PrintToChat(client, "You must use !tec or !tac in order to pause.");
+    }
+
+    return Plugin_Handled;
 }
 
-void Pause(int client)
+Action OnSetPauseCommand(int client, const char[] command, int argc)
 {
-    is_paused = true;
-    PauseWithoutSideEffects(client);
+    PrintToConsole(client, "You must use pause_technical or pause_tactical in order to pause.");
+    PrintToChat(client, "You must use !tec or !tac in order to pause.");
+    return Plugin_Handled;
 }
 
-void UnpauseWithoutSideEffects(int client)
-{
-    allow_unpause = true;
-    FakeClientCommand(client, "unpause");
-    allow_unpause = false;
-}
-
-void Unpause(int client)
-{
-    is_paused = false;
-    UnpauseWithoutSideEffects(client);
-    allow_player_unpause = false;
-
-    if(pause_inform_duration_timer != null)
-        KillTimer(pause_inform_duration_timer);
-
-    pause_inform_duration_timer = null;
-    pause_duration = 0;
-}
-
-Action PlayerTryUnpause(int client)
+Action OnUnpauseCommand(int client, const char[] command, int argc)
 {
     if (!allow_player_unpause)
+    {
+        ReplyToCommand(client, "You are not allowed to unpause the game.");
         return Plugin_Continue;
+    }
 
     allow_player_unpause = false;
 
@@ -188,62 +176,19 @@ Action PlayerTryUnpause(int client)
     Format(third_person_message, sizeof(third_person_message), "%s team is unpausing the game.", team_name);
     PrintToChatAllPerspective(first_person_message, third_person_message, team);
 
+    if (pause_inform_duration_timer != null)
+        KillTimer(pause_inform_duration_timer);
+
+    pause_inform_duration_timer = null;
+    pause_duration = 0;
+
     UnpauseLater(10.0, client);
-
-    return Plugin_Handled;
-}
-
-Action OnPauseCommand(int client, const char[] command, int argc)
-{
-    if (!is_paused)
-    {
-        if (!allow_pause)
-        {
-            PrintToConsole(client, "You must use pause_technical or pause_tactical in order to pause.");
-            PrintToChat(client, "You must use !tech or !tac in order to pause.");
-            return Plugin_Handled;
-        }
-    }
-    else
-    {
-        if (!allow_unpause)
-        {
-            if (PlayerTryUnpause(client) == Plugin_Handled)
-                return Plugin_Handled;
-
-            ReplyToCommand(client, "You are not allowed to unpause the game.");
-            return Plugin_Handled;
-        }
-    }
-
-    return Plugin_Continue;
-}
-
-Action OnSetPauseCommand(int client, const char[] command, int argc)
-{
-    if (allow_pause)
-        return Plugin_Continue;
-
-    PrintToConsole(client, "You must use pause_technical or pause_tactical in order to pause.");
-    PrintToChat(client, "You must use !tech or !tac in order to pause.");
-    return Plugin_Handled;
-}
-
-Action OnUnpauseCommand(int client, const char[] command, int argc)
-{
-    if (allow_unpause)
-        return Plugin_Continue;
-
-    if (PlayerTryUnpause(client) == Plugin_Handled)
-        return Plugin_Handled;
-
-    ReplyToCommand(client, "You are not allowed to unpause the game.");
     return Plugin_Handled;
 }
 
 void PauseTimerCallback(Handle timer, int client)
 {
-    Unpause(client);
+    SetPaused(false);
 }
 
 void PauseTimerInformTickCallback(Handle timer, int secondsRemaining)
@@ -284,7 +229,7 @@ void PrintToChatAllPerspective(const char[] first_person, const char[] third_per
 
 Action CommandPause(int client, const char[] name, ConVar remaining, float length)
 {
-    if (is_paused)
+    if (IsPaused())
         return Plugin_Continue;
 
     int team = GetClientTeam(client);
@@ -324,7 +269,7 @@ Action CommandPause(int client, const char[] name, ConVar remaining, float lengt
         PrintToChatAllPerspective(first_person_message, third_person_message, team);
     }
 
-    Pause(client);
+    SetPaused(true);
 
     if (length > 0)
     {
@@ -362,7 +307,7 @@ Action CommandPauseTechnical(int client, int args)
 
 void PauseTimerRepauseCallback(Handle timer, int client)
 {
-    PauseWithoutSideEffects(client);
+    SetPaused(true);
 }
 
 Action CommandUnpausePause(int client, int args)
@@ -370,10 +315,7 @@ Action CommandUnpausePause(int client, int args)
     if (!sv_pausable.BoolValue)
         return Plugin_Continue;
 
-    if (client == 0)
-        return Plugin_Continue;
-
-    if (!is_paused)
+    if (!IsPaused())
         return Plugin_Handled;
 
     int team = GetClientTeam(client);
@@ -387,17 +329,18 @@ Action CommandUnpausePause(int client, int args)
     Format(third_person_message, sizeof(third_person_message), "%s team re-paused the game.", team_name);
     PrintToChatAllPerspective(first_person_message, third_person_message, team);
 
-    UnpauseWithoutSideEffects(client);
+    SetPaused(false);
     CreateTimer(0.1, PauseTimerRepauseCallback, client, TIMER_FLAG_NO_MAPCHANGE);
 
     return Plugin_Handled;
 }
 
-Action CommandSay(int client, const char[] command, int args) {
+Action CommandSay(int client, const char[] command, int args)
+{
     if (client == 0)
         return Plugin_Continue;
 
-    if (!is_paused)
+    if (!IsPaused())
         return Plugin_Continue;
 
     char buffer[256];

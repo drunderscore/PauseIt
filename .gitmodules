@@ -17,3 +17,6 @@
 	path = Rewind/hl2sdk
 	url = https://github.com/drunderscore/hl2sdk
 	branch = tf2
+[submodule "Rewind/sourcemod"]
+	path = Rewind/sourcemod
+	url = https://github.com/alliedmodders/sourcemod

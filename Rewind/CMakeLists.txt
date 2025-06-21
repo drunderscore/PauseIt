@@ -3,16 +3,14 @@ project(PauseItRewind CXX)
 
 set(HL2SDK_PATH ${PROJECT_SOURCE_DIR}/hl2sdk)
 set(METAMOD_SOURCE ${PROJECT_SOURCE_DIR}/metamod-source)
+set(SOURCEMOD ${PROJECT_SOURCE_DIR}/sourcemod)
 
 set(CMAKE_CXX_STANDARD 20)
 
 add_compile_options(-m32)
 add_link_options(-m32)
 
-# mathlib.h uses register and just spams a ton of warnings, so let's just ignore them, no one is actually going to use
-# register anyways.
-add_compile_options(-Wno-register)
-
+# We are dlopen'd and dlclose'd, so this is nice-to-have.
 add_compile_options(-fno-gnu-unique)
 
 add_subdirectory(JMP)
@@ -22,13 +20,8 @@ add_subdirectory(subhook)
 
 add_library(PauseItRewind SHARED
         src/PauseItRewind.cpp
+        ${SOURCEMOD}/public/smsdk_ext.cpp
 )
-
-# FIXME: Rebasing/merging alliedmodders/hl2sdk into drunderscore/hl2sdk got us the VScript changes, but it also got us
-#        some changes to utlvector.h. These changes do not compile on Linux without -fpermissive.
-#        On it's own it's not that problematic, but it means that ALL of my code will also be compiled with
-#        -fpermissive, which isn't desirable at all.
-target_compile_options(PauseItRewind PRIVATE -fpermissive)
 
 target_compile_definitions(PauseItRewind PRIVATE
         SOURCE_ENGINE=11
@@ -36,10 +29,10 @@ target_compile_definitions(PauseItRewind PRIVATE
         _stricmp=strcasecmp
         _snprintf=snprintf
         _vsnprintf=vsnprintf
-        HAVE_STDINT_H
         GNUC
         _LINUX
         POSIX
+        NO_MALLOC_OVERRIDE
         # These are all from sourcemod/AMBuildScript
         SE_EPISODEONE=1
         SE_ORANGEBOX=3
@@ -62,11 +55,11 @@ target_compile_definitions(PauseItRewind PRIVATE
         SE_DOI=20
         SE_MOCK=999
 )
+
 target_include_directories(PauseItRewind PRIVATE SYSTEM
         ${PROJECT_SOURCE_DIR}
         ${HL2SDK_PATH}/common
         ${HL2SDK_PATH}/public
-        ${HL2SDK_PATH}/public/engine
         ${HL2SDK_PATH}/public/mathlib
         ${HL2SDK_PATH}/public/vstdlib
         ${HL2SDK_PATH}/public/tier0
@@ -75,9 +68,18 @@ target_include_directories(PauseItRewind PRIVATE SYSTEM
         ${METAMOD_SOURCE}/core
         ${METAMOD_SOURCE}/core/sourcehook
 
+        ${SOURCEMOD}
+        ${SOURCEMOD}/public
+        ${SOURCEMOD}/public/extensions
+        ${SOURCEMOD}/sourcepawn/include
+        ${SOURCEMOD}/public/amtl/amtl
+        ${SOURCEMOD}/public/amtl
+        ${SOURCEMOD}/bridge/include/
+
         JMP/src
+
+        ${PROJECT_SOURCE_DIR}/src
 )
 
 set_target_properties(PauseItRewind PROPERTIES PREFIX "")
-target_link_directories(PauseItRewind PRIVATE ${HL2SDK_PATH}/lib/linux)
-target_link_libraries(PauseItRewind PRIVATE -l:tier1_i486.a -l:libvstdlib_srv.so -l:libtier0_srv.so JMP subhook::subhook -l:mathlib_i486.a)
+target_link_libraries(PauseItRewind PRIVATE JMP subhook::subhook)
