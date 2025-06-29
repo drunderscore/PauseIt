@@ -21,7 +21,6 @@ ConVar pause_tactical_max;
 ConVar pause_technical_max;
 ConVar pause_tactical_length;
 ConVar pause_technical_length;
-ConVar pause_unpause_require_admin;
 
 ArrayList pause_remaining_tactical;
 ArrayList pause_remaining_technical;
@@ -133,6 +132,9 @@ void InitializeRemainingPauseCounts()
 
 Action OnPauseCommand(int client, const char[] command, int argc)
 {
+    if (client == 0)
+        return Plugin_Continue;
+
     if (IsPaused())
     {
         PrintToConsole(client, "You must use unpause in order to unpause.");
@@ -149,6 +151,13 @@ Action OnPauseCommand(int client, const char[] command, int argc)
 
 Action OnSetPauseCommand(int client, const char[] command, int argc)
 {
+    // The server can pause at any time, unconditionally.
+    if (client == 0)
+    {
+        SetPaused(true);
+        return Plugin_Handled;
+    }
+
     PrintToConsole(client, "You must use pause_technical or pause_tactical in order to pause.");
     PrintToChat(client, "You must use !tec or !tac in order to pause.");
     return Plugin_Handled;
@@ -156,25 +165,29 @@ Action OnSetPauseCommand(int client, const char[] command, int argc)
 
 Action OnUnpauseCommand(int client, const char[] command, int argc)
 {
-    if (!allow_player_unpause)
+    // The server can unpause at any time, unconditionally.
+    if (client != 0)
     {
-        ReplyToCommand(client, "You are not allowed to unpause the game.");
-        return Plugin_Continue;
+        if (!allow_player_unpause)
+        {
+            ReplyToCommand(client, "You are not allowed to unpause the game.");
+            return Plugin_Continue;
+        }
+
+        int team = GetClientTeam(client);
+
+        char team_name[128];
+        GetTeamName(team, team_name, sizeof(team_name));
+
+        char first_person_message[256];
+        char third_person_message[256];
+
+        Format(first_person_message, sizeof(first_person_message), "Your team is unpausing the game.");
+        Format(third_person_message, sizeof(third_person_message), "%s team is unpausing the game.", team_name);
+        PrintToChatAllPerspective(first_person_message, third_person_message, team);
     }
 
     allow_player_unpause = false;
-
-    int team = GetClientTeam(client);
-
-    char team_name[128];
-    GetTeamName(team, team_name, sizeof(team_name));
-
-    char first_person_message[256];
-    char third_person_message[256];
-
-    Format(first_person_message, sizeof(first_person_message), "Your team is unpausing the game.");
-    Format(third_person_message, sizeof(third_person_message), "%s team is unpausing the game.", team_name);
-    PrintToChatAllPerspective(first_person_message, third_person_message, team);
 
     if (pause_inform_duration_timer != null)
         KillTimer(pause_inform_duration_timer);
@@ -253,7 +266,7 @@ Action CommandPause(int client, const char[] name, ConVar remaining, float lengt
     Format(third_person_message, sizeof(third_person_message), "%s team took a %s pause.", team_name, name);
     PrintToChatAllPerspective(first_person_message, third_person_message, team);
 
-    // If might be less than one, which indicates unlimited pauses, in which cause we don't need to do any of this logic.
+    // It might be less than one, which indicates unlimited pauses, in which cause we don't need to do any of this logic.
     if (remaining.IntValue >= 1)
     {
         remaining.IntValue -= 1;
@@ -290,6 +303,9 @@ Action CommandPauseTactical(int client, int args)
     if (!sv_pausable.BoolValue)
         return Plugin_Continue;
 
+    if (client == 0)
+        return Plugin_Continue;
+
     int team = GetClientTeam(client);
 
     return CommandPause(client, "tactical", pause_remaining_tactical.Get(team), pause_tactical_length.FloatValue);
@@ -298,6 +314,9 @@ Action CommandPauseTactical(int client, int args)
 Action CommandPauseTechnical(int client, int args)
 {
     if (!sv_pausable.BoolValue)
+        return Plugin_Continue;
+
+    if (client == 0)
         return Plugin_Continue;
 
     int team = GetClientTeam(client);
