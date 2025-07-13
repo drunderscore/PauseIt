@@ -5,12 +5,17 @@ The gameplay-integrity focused pause suite that'll time you out
 Fine-grained control on pause variables for a match.
 
 ### Usage
-| Convar               | Description |
-|----------------------|--------------|
-| `pause_tactical_max` |Maximum number of tactical pauses a team gets each match. 0 means none, -1 means unlimited.|
-| `pause_technical_max` |Maximum number of technical pauses a team gets each match. 0 means none, -1 means unlimited.|
-| `pause_tactical_length` |The length of a tactical pause, in seconds.|
-| `pause_technical_length` |The length of a technical pause, in seconds.|
+| ConVar                   | Description  |
+|--------------------------|--------------|
+| `pause_tactical_max`     | Maximum number of tactical pauses a team gets each match. 0 means none, -1 means unlimited. |
+| `pause_technical_max`    | Maximum number of technical pauses a team gets each match. 0 means none, -1 means unlimited. |
+| `pause_tactical_length`  | The length of a tactical pause, in seconds. |
+| `pause_technical_length` | The length of a technical pause, in seconds. |
+
+| Command (console or !chat) | Aliases |
+|----------------------------|---------|
+| `pause_tactical`           | `tactical`, `tac` |
+| `pause_technical`          | `technical`, `tech`, `tec` |
 
 _During_ the match, you may use, for example, `pause_remaining_technical_red` to adjust the number of pauses that team has in the current moment.
 
