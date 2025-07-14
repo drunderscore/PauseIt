@@ -171,7 +171,7 @@ Action OnUnpauseCommand(int client, const char[] command, int argc)
         if (!allow_player_unpause)
         {
             ReplyToCommand(client, "You are not allowed to unpause the game.");
-            return Plugin_Continue;
+            return Plugin_Handled;
         }
 
         int team = GetClientTeam(client);
