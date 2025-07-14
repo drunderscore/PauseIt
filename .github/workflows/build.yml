@@ -1,0 +1,29 @@
+name: Build
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: Install Zig
+        uses: mlugg/setup-zig@v2
+        with:
+          version: 0.14.1
+      - name: Build
+        run: |
+          cd ${{github.workspace}}/Rewind
+          zig build -Drelease
+      - uses: actions/upload-artifact@v4
+        with:
+          name: output
+          path: ${{github.workspace}}/Rewind/zig-out/lib/PauseItRewind.ext.so
