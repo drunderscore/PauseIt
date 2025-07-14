@@ -19,9 +19,9 @@ pub fn build(b: *std.Build) void {
 
     subhook.addCSourceFiles(.{
         .files = &.{
-            "Rewind/subhook/subhook.c",
-            "Rewind/subhook/subhook_x86.c",
-            "Rewind/subhook/subhook_unix.c",
+            "subhook/subhook.c",
+            "subhook/subhook_x86.c",
+            "subhook/subhook_unix.c",
         },
     });
 
@@ -36,7 +36,7 @@ pub fn build(b: *std.Build) void {
 
     jmp.addCSourceFiles(.{
         .files = &.{
-            "Rewind/JMP/src/JMP/Platforms/Linux.cpp",
+            "JMP/src/JMP/Platforms/Linux.cpp",
         },
         .flags = &.{
             "-std=c++20",
@@ -57,8 +57,8 @@ pub fn build(b: *std.Build) void {
 
     rewind.addCSourceFiles(.{
         .files = &.{
-            "Rewind/src/PauseItRewind.cpp",
-            "Rewind/sourcemod/public/smsdk_ext.cpp",
+            "src/PauseItRewind.cpp",
+            "sourcemod/public/smsdk_ext.cpp",
         },
         .flags = &.{
             "-std=c++20",
@@ -95,34 +95,31 @@ pub fn build(b: *std.Build) void {
         },
     });
 
-    // FIXME: why? for JMP and subhook maybe?
-    rewind.addSystemIncludePath(b.path("Rewind"));
-    rewind.addSystemIncludePath(b.path("Rewind/hl2sdk/common"));
-    rewind.addSystemIncludePath(b.path("Rewind/hl2sdk/public"));
-    rewind.addSystemIncludePath(b.path("Rewind/hl2sdk/public/mathlib"));
-    rewind.addSystemIncludePath(b.path("Rewind/hl2sdk/public/vstdlib"));
-    rewind.addSystemIncludePath(b.path("Rewind/hl2sdk/public/tier0"));
-    rewind.addSystemIncludePath(b.path("Rewind/hl2sdk/public/tier1"));
-    rewind.addSystemIncludePath(b.path("Rewind/hl2sdk/public/game/server"));
-    rewind.addSystemIncludePath(b.path("Rewind/metamod-source/core"));
-    rewind.addSystemIncludePath(b.path("Rewind/metamod-source/core/sourcehook"));
+    rewind.addSystemIncludePath(b.path("hl2sdk/common"));
+    rewind.addSystemIncludePath(b.path("hl2sdk/public"));
+    rewind.addSystemIncludePath(b.path("hl2sdk/public/mathlib"));
+    rewind.addSystemIncludePath(b.path("hl2sdk/public/vstdlib"));
+    rewind.addSystemIncludePath(b.path("hl2sdk/public/tier0"));
+    rewind.addSystemIncludePath(b.path("hl2sdk/public/tier1"));
+    rewind.addSystemIncludePath(b.path("metamod-source/core"));
+    rewind.addSystemIncludePath(b.path("metamod-source/core/sourcehook"));
 
-    rewind.addSystemIncludePath(b.path("Rewind/sourcemod"));
-    rewind.addSystemIncludePath(b.path("Rewind/sourcemod/public"));
-    rewind.addSystemIncludePath(b.path("Rewind/sourcemod/public/extensions"));
-    rewind.addSystemIncludePath(b.path("Rewind/sourcemod/sourcepawn/include"));
-    rewind.addSystemIncludePath(b.path("Rewind/sourcemod/public/amtl/amtl"));
-    rewind.addSystemIncludePath(b.path("Rewind/sourcemod/public/amtl"));
-    rewind.addSystemIncludePath(b.path("Rewind/sourcemod/bridge/include"));
+    rewind.addSystemIncludePath(b.path("sourcemod"));
+    rewind.addSystemIncludePath(b.path("sourcemod/public"));
+    rewind.addSystemIncludePath(b.path("sourcemod/public/extensions"));
+    rewind.addSystemIncludePath(b.path("sourcemod/sourcepawn/include"));
+    rewind.addSystemIncludePath(b.path("sourcemod/public/amtl/amtl"));
+    rewind.addSystemIncludePath(b.path("sourcemod/public/amtl"));
+    rewind.addSystemIncludePath(b.path("sourcemod/bridge/include"));
 
-    rewind.addSystemIncludePath(b.path("Rewind/JMP/src"));
+    rewind.addSystemIncludePath(b.path("JMP/src"));
 
-    rewind.addSystemIncludePath(b.path("Rewind/src"));
+    rewind.addSystemIncludePath(b.path("src"));
 
     // NOTE: we don't normally say it but i think subhook does it automatically for us
-    rewind.addSystemIncludePath(b.path("Rewind/subhook"));
+    rewind.addSystemIncludePath(b.path("subhook"));
 
-    rewind.addLibraryPath(b.path("Rewind/hl2sdk/lib/linux"));
+    rewind.addLibraryPath(b.path("hl2sdk/lib/linux"));
     rewind.linkSystemLibrary("tier0_srv");
 
     rewind.linkLibrary(subhook);
