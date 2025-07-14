@@ -126,4 +126,11 @@ pub fn build(b: *std.Build) void {
     rewind.linkLibrary(jmp);
 
     b.installArtifact(rewind);
+
+    // TODO: Zig does not provide a way to set the name of a shared library.
+    //       Instead, add a new file install to the build tree.
+    //       See: https://github.com/ziglang/zig/issues/2231
+    const rewind_install = b.addInstallLibFile(rewind.getEmittedBin(), "PauseItRewind.ext.so");
+    rewind_install.step.dependOn(&rewind.step);
+    b.getInstallStep().dependOn(&rewind_install.step);
 }
